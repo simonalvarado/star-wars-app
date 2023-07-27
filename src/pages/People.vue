@@ -22,21 +22,13 @@
         </q-card-section>
     </q-card>
 
-    <q-btn
-      @click="prevPage"
-      :disabled="disabledPrevButton"
-      :class="disabledPrevButton ? 'disabled' : ''"
-    >
-      Prev
-    </q-btn>
-    <q-btn
-      @click="nextPage"
-      :disabled="disabledNextButton"
-      :class="disabledNextButton ? 'disabled' : ''"
-    >
-      Next
-    </q-btn>
-
+    <q-pagination
+      v-model="currentPage"
+      :min="1"
+      :max="totalPages"
+      @input="changePage"
+      class="q-mt-md"
+    />
   </div>
 </template>
 <script>
@@ -49,54 +41,51 @@ export default defineComponent({
     return {
       people: [],
       allPeople: [],
-      searchQuery: ''
+      searchQuery: '',
+      currentPage: 1,
+      perPage: 10
     }
-  },
-  updated () {
-    this.people = this.filteredPeople
   },
   mounted () {
     this.$store.dispatch('getPeople').then(() => {
       this.people = this.$store.state.people
+      this.updatePaginatedPeople()
     })
-    this.getAllPeopleData()
+    // this.getAllPeopleData()
+    this.currentPage = this.$store.state.currentPage
+    this.perPage = this.$store.state.perPage
+    console.log('total pages', this.totalPages)
+    this.getPeopleAlt()
   },
   computed: {
-    disabledPrevButton () {
-      return this.$store.state.previous === null
-    },
-    disabledNextButton () {
-      return this.$store.state.f === null
-    },
     filteredPeople () {
       return this.$store.state.people.filter(person => {
         return person.name.toLowerCase().includes(this.searchQuery.toLowerCase())
       })
+    },
+    totalPages () {
+      return Math.ceil(this.allPeople.length / this.perPage)
     }
   },
   methods: {
     async getAllPeopleData () {
-      let allPeople = []
       let nextPageUrl = 'https://swapi.dev/api/people/'
 
       // Realiza solicitudes a la API hasta que no haya una URL de siguiente página
       while (nextPageUrl) {
         console.log(nextPageUrl)
         const response = await axios.get(nextPageUrl)
-        allPeople = allPeople.concat(response.data.results)
+        this.allPeople = this.allPeople.concat(response.data.results)
         nextPageUrl = response.data.next
       }
 
-      console.log(allPeople)
-      this.allPeople = allPeople
+      console.log(this.allPeople)
+      this.updatePaginatedPeople()
     },
-    async prevPage () {
-      const response = await axios.get(this.$store.state.previous)
-      this.$store.commit('setPeople', response.data)
-    },
-    async nextPage () {
-      const response = await axios.get(this.$store.state.next)
-      this.$store.commit('setPeople', response.data)
+    updatePaginatedPeople () {
+      const startIndex = (this.currentPage - 1) * this.perPage
+      const endIndex = startIndex + this.perPage
+      this.paginatedPeople = this.allPeople.slice(startIndex, endIndex)
     },
     searchPeople () {
       if (this.searchQuery === '') {
@@ -104,12 +93,11 @@ export default defineComponent({
       } else {
         this.people = this.filteredPeople
       }
+    },
+    changePage (page) {
+      this.currentPage = page
+      this.updatePaginatedPeople()
     }
   }
 })
 </script>
-<style scoped>
-  .disabled {
-    cursor: not-allowed;
-  }
-</style>
