@@ -26,18 +26,16 @@ export default store(function (/* { ssrContext } */) {
       peopleDetail: {},
       planetDetail: {},
       starshipDetail: {},
-      planetsPageInfo: {
-        count: 0,
-        next: null,
-        previous: null
-      },
-      previous: ''
+      planetsPageInfo: {},
+      previous: '',
+      next: ''
     },
 
     mutations: {
       setPeople (state, payload) {
         state.people = payload.results
         state.previous = payload.previous
+        state.next = payload.next
       },
       setPlanets (state, payload) {
         state.planets = payload
@@ -67,11 +65,8 @@ export default store(function (/* { ssrContext } */) {
         const response = await axios.get('/people')
         commit('setPeople', response.data.results)
       },
-      async getPeople ({ commit }, payload = 1) {
-        if (payload === 1) return payload
-        else payload++
-        const response = await axios.get(`/people?page=${payload}`)
-        console.log(response.data)
+      async getPeople ({ commit }) {
+        const response = await axios.get('/people')
         commit('setPeople', response.data)
       },
       async getPlanets ({ commit, dispatch }, page = 1) {
