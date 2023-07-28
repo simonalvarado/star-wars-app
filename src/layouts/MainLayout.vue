@@ -3,7 +3,9 @@
     <q-header elevated>
       <q-toolbar>
 
-        <q-toolbar-title>
+        <q-btn @click="$router.go(-1)" v-if="showBackButton" flat dense icon="fas fa-arrow-left" class="absolute" size="sm" />
+
+        <q-toolbar-title class="text-center">
           Star Wars App
         </q-toolbar-title>
 
@@ -17,7 +19,8 @@
 </template>
 
 <script>
-import { defineComponent, ref } from 'vue'
+import { defineComponent, watch, ref } from 'vue'
+import { useRoute } from 'vue-router'
 
 export default defineComponent({
   name: 'MainLayout',
@@ -26,13 +29,17 @@ export default defineComponent({
   },
 
   setup () {
-    const leftDrawerOpen = ref(false)
-
-    return {
-      leftDrawerOpen,
-      toggleLeftDrawer () {
-        leftDrawerOpen.value = !leftDrawerOpen.value
+    const route = useRoute()
+    const showBackButton = ref(false)
+    console.log('route path', route.path)
+    watch(
+      () => route.path,
+      (newPath) => {
+        showBackButton.value = newPath !== '/'
       }
+    )
+    return {
+      showBackButton
     }
   }
 })

@@ -1,25 +1,27 @@
 <template>
   <div>
     <q-input
-        v-model="searchQuery"
-        label="Buscar por nombre"
-        @keyup="searchPeople"
-        filled
-        type="search"
+      v-model="searchQuery"
+      label="Buscar por nombre"
+      @keyup="searchPeople"
+      filled
+      type="search"
     >
-        <template v-slot:append>
-          <q-icon name="search" />
-        </template>
+      <template v-slot:append>
+        <q-icon name="search" />
+      </template>
     </q-input>
     <q-card
       class="my-card text-black"
       v-for="(person, index) in people"
       :key="index"
     >
+      <router-link :to="{ name: 'PeopleDetail', params: { id: transform(person.url) } }">
         <q-card-section>
-            <div class="text-h6 q-ma-sm-sm">{{ person.name }}</div>
-            <div class="text-subtitle2 q-ma-sm-sm">Gender: {{ person.gender}}</div>
+          <div class="text-h6 q-ma-sm-sm">{{ person.name }}</div>
+          <div class="text-subtitle2 q-ma-sm-sm decoration-none">Gender: {{ person.gender }}</div>
         </q-card-section>
+      </router-link>
     </q-card>
 
     <q-btn
@@ -36,7 +38,6 @@
     >
       Next
     </q-btn>
-
   </div>
 </template>
 <script>
@@ -48,7 +49,6 @@ export default defineComponent({
   data () {
     return {
       people: [],
-      allPeople: [],
       searchQuery: ''
     }
   },
@@ -59,36 +59,28 @@ export default defineComponent({
     this.$store.dispatch('getPeople').then(() => {
       this.people = this.$store.state.people
     })
-    this.getAllPeopleData()
   },
   computed: {
     disabledPrevButton () {
       return this.$store.state.previous === null
     },
     disabledNextButton () {
-      return this.$store.state.f === null
+      return this.$store.state.next === null
     },
     filteredPeople () {
-      return this.$store.state.people.filter(person => {
-        return person.name.toLowerCase().includes(this.searchQuery.toLowerCase())
+      return this.$store.state.people.filter((person) => {
+        return person.name
+          .toLowerCase()
+          .includes(this.searchQuery.toLowerCase())
       })
     }
   },
   methods: {
-    async getAllPeopleData () {
-      let allPeople = []
-      let nextPageUrl = 'https://swapi.dev/api/people/'
-
-      // Realiza solicitudes a la API hasta que no haya una URL de siguiente página
-      while (nextPageUrl) {
-        console.log(nextPageUrl)
-        const response = await axios.get(nextPageUrl)
-        allPeople = allPeople.concat(response.data.results)
-        nextPageUrl = response.data.next
-      }
-
-      console.log(allPeople)
-      this.allPeople = allPeople
+    transform (string) {
+      const url = string
+      const parts = url.split('/')
+      const number = parts[parts.length - 2]
+      return parseInt(number)
     },
     async prevPage () {
       const response = await axios.get(this.$store.state.previous)
@@ -108,8 +100,13 @@ export default defineComponent({
   }
 })
 </script>
+
 <style scoped>
-  .disabled {
-    cursor: not-allowed;
-  }
+.disabled {
+  cursor: not-allowed;
+}
+a:-webkit-any-link {
+  text-decoration: none;
+  color: #000000;
+}
 </style>
