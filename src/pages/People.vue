@@ -19,8 +19,8 @@
       </q-input>
       <q-card
         class="my-card text-black full-width"
-        v-for="person in people"
-        :key="person.url"
+        v-for="(person, index) in people"
+        :key="index"
         dark
       >
         <router-link :to="{ name: 'PeopleDetail', params: { id: transform(person.url) } }">
@@ -53,6 +53,7 @@
 <script>
 import axios from 'axios'
 import { defineComponent } from 'vue'
+import transform from '../utils/transform.js'
 
 export default defineComponent({
   name: 'PagePeople',
@@ -60,7 +61,8 @@ export default defineComponent({
     return {
       people: [],
       searchQuery: '',
-      loading: true
+      loading: true,
+      transform
     }
   },
   updated () {
@@ -89,13 +91,6 @@ export default defineComponent({
     }
   },
   methods: {
-    transform (string) {
-      const url = string
-      console.log('url', url)
-      const parts = url.split('/')
-      const number = parts[parts.length - 2]
-      return parseInt(number)
-    },
     async prevPage () {
       const response = await axios.get(this.$store.state.previous)
       this.$store.commit('setPeople', response.data)

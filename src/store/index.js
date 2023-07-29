@@ -4,21 +4,6 @@ import axios from 'axios'
 
 axios.defaults.baseURL = 'https://swapi.dev/api/'
 
-async function fetchDataIfNotEmpty (url) {
-  if (!url || typeof url !== 'string') {
-    console.error('Invalid URL:', url)
-    return {}
-  }
-
-  try {
-    const response = await axios.get(url)
-    return response.data
-  } catch (error) {
-    console.error('Error fetching data:', error)
-    return {}
-  }
-}
-
 // import example from './module-example'
 
 /*
@@ -38,13 +23,7 @@ export default store(function (/* { ssrContext } */) {
       people: [],
       planets: [],
       starships: [],
-      peopleDetail: {
-        homeworldData: {},
-        filmsData: [],
-        speciesData: {},
-        vehiclesData: [],
-        starshipsData: []
-      },
+      peopleDetail: {},
       planetDetail: {},
       starshipDetail: {},
       planetsPageInfo: {},
@@ -64,13 +43,8 @@ export default store(function (/* { ssrContext } */) {
       setStarships (state, payload) {
         state.starships = payload
       },
-      setPeopleDetail (state, { personData, homeworldData, filmsData, speciesData, vehiclesData, starshipsData }) {
-        state.peopleDetail = personData
-        state.peopleDetail.homeworldData = homeworldData
-        state.peopleDetail.filmsData = filmsData
-        state.peopleDetail.speciesData = speciesData
-        state.peopleDetail.vehiclesData = vehiclesData
-        state.peopleDetail.starshipsData = starshipsData
+      setPeopleDetail (state, payload) {
+        state.peopleDetail = payload
       },
       setPlanetDetail (state, payload) {
         state.planetDetail = payload
@@ -123,19 +97,7 @@ export default store(function (/* { ssrContext } */) {
       },
       async getPeopleDetail ({ commit }, id) {
         const response = await axios.get(`/people/${id}`)
-        const personData = response.data
-        const homeworldData = await fetchDataIfNotEmpty(personData.homeworld)
-        const filmsData = await Promise.all(
-          personData.films.map(async (filmURL) => fetchDataIfNotEmpty(filmURL))
-        )
-        const speciesData = await fetchDataIfNotEmpty(personData.species)
-        const vehiclesData = await Promise.all(
-          personData.vehicles.map(async (vehicleURL) => fetchDataIfNotEmpty(vehicleURL))
-        )
-        const starshipsData = await Promise.all(
-          personData.starships.map(async (starshipURL) => fetchDataIfNotEmpty(starshipURL))
-        )
-        commit('setPeopleDetail', { personData, homeworldData, filmsData, speciesData, vehiclesData, starshipsData })
+        commit('setPeopleDetail', response.data)
       },
       async getPlanetDetail ({ commit }, id) {
         const response = await axios.get(`/planets/${id}`)
