@@ -6,80 +6,70 @@
         <div v-else>
             <q-card flat bordered class="my-card text-center q-mb-md">
                 <q-card-section>
-                    <div class="text-h4"> {{ peopleDetail.name }} </div>
+                    <div class="text-h4"> {{ planetsDetail.name }} </div>
                 </q-card-section>
 
                 <q-separator inset />
 
                 <q-card-section>
-                    <b>Height:</b> {{ peopleDetail.height }}
+                    <b>Rotation period:</b> {{ planetsDetail.rotation_period }}
                 </q-card-section>
 
                 <q-separator inset />
 
                 <q-card-section>
-                    <b>Mass:</b> {{ peopleDetail.mass }}
+                    <b>Orbital period:</b> {{ planetsDetail.orbital_period }}
                 </q-card-section>
 
                 <q-separator inset />
 
                 <q-card-section>
-                    <b>Hair color:</b> {{ peopleDetail.hair_color }}
+                    <b>Diameter:</b> {{ planetsDetail.diameter }}
                 </q-card-section>
 
                 <q-separator inset />
 
                 <q-card-section>
-                    <b>Skin color:</b> {{ peopleDetail.skin_color }}
+                    <b>climate:</b> {{ planetsDetail.climate }}
                 </q-card-section>
 
                 <q-separator inset />
 
                 <q-card-section>
-                    <b>Eye color:</b> {{ peopleDetail.eye_color }}
+                    <b>Gravity:</b> {{ planetsDetail.gravity }}
                 </q-card-section>
 
                 <q-separator inset />
 
                 <q-card-section>
-                    <b>Birth year:</b> {{ peopleDetail.birth_year }}
+                    <b>Terrain:</b> {{ planetsDetail.terrain }}
                 </q-card-section>
 
                 <q-separator inset />
 
                 <q-card-section>
-                    <b>Gender:</b> {{ peopleDetail.gender }}
+                    <b>Surface water:</b> {{ planetsDetail.surface_water }}
                 </q-card-section>
 
                 <q-separator inset />
 
                 <q-card-section>
-                    <b>Homeworld:</b> {{ peopleDetail.homeworldData.name }}
+                    <b>Population:</b> {{ planetsDetail.population }}
                 </q-card-section>
 
                 <q-separator inset />
 
-                <q-card-section class="q-py-sm" v-for="(film, index) in peopleDetail.filmsData" :key="index">
+                <q-card-section class="q-py-sm" v-for="(resident, index) in planetsDetail.residentsData" :key="index">
+                    <b>Resident</b> {{ index + 1 }}: {{ resident.name }}
+                </q-card-section>
+
+                <q-separator inset />
+
+                <q-card-section class="q-py-sm" v-for="(film, index) in planetsDetail.filmsData" :key="index">
                     <b>Film {{ index + 1 }}:</b> {{ film.title }}
                 </q-card-section>
 
                 <q-separator inset />
-
-                <q-card-section>
-                    <b>Species:</b> {{ peopleDetail.speciesData.name }}
-                </q-card-section>
-
-                <q-separator inset />
-
-                <q-card-section class="q-py-sm" v-for="(vehicle, index) in peopleDetail.vehiclesData" :key="index">
-                    <b>Vehicle</b> {{ index + 1 }}: {{ vehicle.name }}
-                </q-card-section>
-
-                <q-separator inset />
-
-                <q-card-section class="q-py-sm" v-for="(starship, index) in peopleDetail.starshipsData" :key="index">
-                    <b>Starship {{ index + 1 }}:</b> {{ starship.name }}
-                </q-card-section>
             </q-card>
         </div>
     </div>
@@ -88,7 +78,7 @@
 import { mapState } from 'vuex'
 
 export default {
-  name: 'PeopleDetail',
+  name: 'PlanetsDetail',
   data () {
     return {
       loading: true
@@ -97,16 +87,16 @@ export default {
 
   mounted () {
     const id = this.$route.params.id
-    this.fetchPeopleDetail(id)
+    this.fetchPlanetsDetail(id)
   },
 
   computed: {
-    ...mapState(['peopleDetail'])
+    ...mapState(['planetsDetail'])
   },
 
   methods: {
-    fetchPeopleDetail (id) {
-      this.$store.dispatch('getPeopleDetail', id).then(() => {
+    fetchPlanetsDetail (id) {
+      this.$store.dispatch('getPlanetsDetail', id).then(() => {
         this.loading = false
       })
     }

@@ -8,8 +8,8 @@ const routes = [
       { path: '/planets', component: () => import('src/pages/Planets.vue'), name: 'Planets' },
       { path: '/starships', component: () => import('src/pages/Starships.vue'), name: 'Starships' },
       { path: '/people/:id', component: () => import('src/pages/PeopleDetail.vue'), name: 'PeopleDetail' },
-      { path: '/planets/:id', component: () => import('src/pages/PlanetDetail.vue'), name: 'PlanetsDetail' },
-      { path: '/starships/:id', component: () => import('src/pages/StarshipDetail.vue'), name: 'StarshipsDetail' }
+      { path: '/planets/:id', component: () => import('src/pages/PlanetsDetail.vue'), name: 'PlanetsDetail' },
+      { path: '/starships/:id', component: () => import('src/pages/StarshipsDetail.vue'), name: 'StarshipsDetail' }
     ]
   },
 

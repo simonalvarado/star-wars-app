@@ -1,62 +1,120 @@
-<template>
-    <div>
-        <q-card
-            class="my-card"
-            v-for="planet in planets"
-            :key="planet.url"
-        >
-            <q-card-section>
-                <div class="text-h6">{{ planet.name }}</div>
-                <div class="text-subtitle2">Climate: {{ planet.climate }}</div>
-            </q-card-section>
-        </q-card>
-
-        <div class="q-pa-lg flex flex-center">
-            <q-pagination
-              v-if="planetsPageInfo"
-              v-model="currentPage"
-              :min="1"
-              :max="totalPages"
-              @input="changePage"
-            />
-        </div>
+<template dark>
+  <div dark class="category-container">
+    <div v-if="loading" class="loading-container">
+      <q-spinner-dots size="60px" color="white" />
     </div>
+    <div v-else>
+      <q-input
+        v-model="searchQuery"
+        label="Buscar por nombre"
+        @keyup="searchPlanets"
+        filled
+        type="search"
+        dark
+        class="search-input full-width"
+      >
+        <template v-slot:append>
+          <q-icon name="search" />
+        </template>
+      </q-input>
+      <q-card
+        class="my-card text-black full-width"
+        v-for="(planet, index) in planets"
+        :key="index"
+        dark
+      >
+        <router-link :to="{ name: 'PlanetsDetail', params: { id: transform(planet.url) } }">
+          <q-card-section>
+            <div class="text-h6 q-ma-sm-sm">{{ planet.name }}</div>
+            <div class="text-subtitle2 q-ma-sm-sm decoration-none">Population: {{ planet.population }}</div>
+          </q-card-section>
+        </router-link>
+      </q-card>
+
+      <div class="buttons-container">
+        <q-btn
+          @click="prevPage"
+          :disabled="disabledPrevButton"
+          :class="disabledPrevButton ? 'disabled' : ''"
+        >
+          Prev
+        </q-btn>
+        <q-btn
+          @click="nextPage"
+          :disabled="disabledNextButton"
+          :class="disabledNextButton ? 'disabled' : ''"
+        >
+          Next
+        </q-btn>
+      </div>
+    </div>
+  </div>
 </template>
 <script>
+import axios from 'axios'
 import { defineComponent } from 'vue'
 
 export default defineComponent({
-  name: 'Planets',
+  name: 'PagePlanets',
   data () {
     return {
-      currentPage: 1,
-      itemsPerPage: 5
+      planets: [],
+      searchQuery: '',
+      loading: true
     }
+  },
+  updated () {
+    this.planets = this.filteredPlanets
+  },
+  mounted () {
+    this.$store.dispatch('getPlanets').then(() => {
+      this.planets = this.$store.state.planets
+      this.loading = false
+      console.log('mounted', this.planets)
+    })
   },
   computed: {
-    planets () {
-      const start = (this.currentPage - 1) * this.itemsPerPage
-      const end = start + this.itemsPerPage
-      return this.$store.state.planets.slice(start, end)
+    disabledPrevButton () {
+      return this.$store.state.planetsPrevious === null
     },
-    totalPages () {
-      return Math.ceil(
-        this.$store.state.planetsPageInfo.count / this.itemsPerPage
-      )
+    disabledNextButton () {
+      return this.$store.state.planetsNext === null
     },
-    planetsPageInfo () {
-      return this.$store.state.planetsPageInfo
+    filteredPlanets () {
+      return this.$store.state.planets.filter((planet) => {
+        return planet.name.toLowerCase().includes(this.searchQuery.toLowerCase())
+      })
     }
   },
-  created () {
-    this.$store.dispatch('getPlanets')
-  },
   methods: {
-    changePage (page) {
-      if (page >= 1 && page <= this.totalPages) {
-        this.currentPage = page
+    transform (string) {
+      const url = string
+      console.log('url', url)
+      const parts = url.split('/')
+      const number = parts[parts.length - 2]
+      return parseInt(number)
+    },
+    async prevPage () {
+      const response = await axios.get(this.$store.state.previous)
+      this.$store.commit('setPlanets', response.data)
+    },
+    async nextPage () {
+      const response = await axios.get(this.$store.state.next)
+      this.$store.commit('setPlanets', response.data)
+    },
+    searchPlanets () {
+      if (this.searchQuery === '') {
+        this.planets = this.$store.state.planets
+      } else {
+        this.planets = this.filteredPlanets
       }
     }
   }
 })
 </script>
+
+<style lang="sass" scoped>
+a:-webkit-any-link
+  text-decoration: none
+  color: #f4f4f4
+</style>

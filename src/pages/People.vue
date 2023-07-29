@@ -1,43 +1,53 @@
-<template>
-  <div>
-    <q-input
-      v-model="searchQuery"
-      label="Buscar por nombre"
-      @keyup="searchPeople"
-      filled
-      type="search"
-    >
-      <template v-slot:append>
-        <q-icon name="search" />
-      </template>
-    </q-input>
-    <q-card
-      class="my-card text-black"
-      v-for="(person, index) in people"
-      :key="index"
-    >
-      <router-link :to="{ name: 'PeopleDetail', params: { id: transform(person.url) } }">
-        <q-card-section>
-          <div class="text-h6 q-ma-sm-sm">{{ person.name }}</div>
-          <div class="text-subtitle2 q-ma-sm-sm decoration-none">Gender: {{ person.gender }}</div>
-        </q-card-section>
-      </router-link>
-    </q-card>
+<template dark>
+  <div dark class="category-container">
+    <div v-if="loading" class="loading-container">
+      <q-spinner-dots size="60px" color="white" />
+    </div>
+    <div v-else>
+      <q-input
+        v-model="searchQuery"
+        label="Buscar por nombre"
+        @keyup="searchPeople"
+        filled
+        type="search"
+        dark
+        class="search-input full-width"
+      >
+        <template v-slot:append>
+          <q-icon name="search" />
+        </template>
+      </q-input>
+      <q-card
+        class="my-card text-black full-width"
+        v-for="person in people"
+        :key="person.url"
+        dark
+      >
+        <router-link :to="{ name: 'PeopleDetail', params: { id: transform(person.url) } }">
+          <q-card-section>
+            <div class="text-h6 q-ma-sm-sm">{{ person.name }}</div>
+            <div class="text-subtitle2 q-ma-sm-sm decoration-none">Gender: {{ person.gender }}</div>
+          </q-card-section>
+        </router-link>
+      </q-card>
 
-    <q-btn
-      @click="prevPage"
-      :disabled="disabledPrevButton"
-      :class="disabledPrevButton ? 'disabled' : ''"
-    >
-      Prev
-    </q-btn>
-    <q-btn
-      @click="nextPage"
-      :disabled="disabledNextButton"
-      :class="disabledNextButton ? 'disabled' : ''"
-    >
-      Next
-    </q-btn>
+      <div class="buttons-container">
+        <q-btn
+          @click="prevPage"
+          :disabled="disabledPrevButton"
+          :class="disabledPrevButton ? 'disabled' : ''"
+        >
+          Prev
+        </q-btn>
+        <q-btn
+          @click="nextPage"
+          :disabled="disabledNextButton"
+          :class="disabledNextButton ? 'disabled' : ''"
+        >
+          Next
+        </q-btn>
+      </div>
+    </div>
   </div>
 </template>
 <script>
@@ -49,7 +59,8 @@ export default defineComponent({
   data () {
     return {
       people: [],
-      searchQuery: ''
+      searchQuery: '',
+      loading: true
     }
   },
   updated () {
@@ -57,7 +68,9 @@ export default defineComponent({
   },
   mounted () {
     this.$store.dispatch('getPeople').then(() => {
+      this.loading = false
       this.people = this.$store.state.people
+      console.log('mounted', this.people)
     })
   },
   computed: {
@@ -78,6 +91,7 @@ export default defineComponent({
   methods: {
     transform (string) {
       const url = string
+      console.log('url', url)
       const parts = url.split('/')
       const number = parts[parts.length - 2]
       return parseInt(number)
@@ -101,12 +115,8 @@ export default defineComponent({
 })
 </script>
 
-<style scoped>
-.disabled {
-  cursor: not-allowed;
-}
-a:-webkit-any-link {
-  text-decoration: none;
-  color: #000000;
-}
+<style lang="sass" scoped>
+a:-webkit-any-link
+  text-decoration: none
+  color: #f4f4f4
 </style>

@@ -1,6 +1,6 @@
-<template>
-  <q-layout view="lHh Lpr lFf">
-    <q-header elevated>
+<template dark>
+  <q-layout dark view="lHh Lpr lFf">
+    <q-header elevated class="star-wars-header">
       <q-toolbar>
 
         <q-btn @click="$router.go(-1)" v-if="showBackButton" flat dense icon="fas fa-arrow-left" class="absolute" size="sm" />
@@ -12,7 +12,7 @@
       </q-toolbar>
     </q-header>
 
-    <q-page-container>
+    <q-page-container class="star-wars-container">
       <router-view />
     </q-page-container>
   </q-layout>
@@ -44,3 +44,12 @@ export default defineComponent({
   }
 })
 </script>
+<style lang="sass" scoped>
+.star-wars-header
+  background-color: #272727
+  color: #f4f4f4
+
+.star-wars-container
+  background-color: #f4f4f4
+  min-height: 100vh
+</style>
