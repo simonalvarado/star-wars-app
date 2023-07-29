@@ -91,12 +91,16 @@ export default defineComponent({
   },
   methods: {
     async prevPage () {
+      this.loading = true
       const response = await axios.get(this.$store.state.previousPlanets)
       this.$store.commit('setPlanets', response.data)
+      this.loading = false
     },
     async nextPage () {
+      this.loading = true
       const response = await axios.get(this.$store.state.nextPlanets)
       this.$store.commit('setPlanets', response.data)
+      this.loading = false
     },
     searchPlanets () {
       if (this.searchQuery === '') {

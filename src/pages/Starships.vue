@@ -91,12 +91,16 @@ export default defineComponent({
   },
   methods: {
     async prevPage () {
+      this.loading = true
       const response = await axios.get(this.$store.state.previousStarships)
       this.$store.commit('setStarships', response.data)
+      this.loading = false
     },
     async nextPage () {
+      this.loading = true
       const response = await axios.get(this.$store.state.nextStarships)
       this.$store.commit('setStarships', response.data)
+      this.loading = false
     },
     searchStarships () {
       if (this.searchQuery === '') {

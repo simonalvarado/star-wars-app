@@ -11,6 +11,7 @@ npm install
 ```bash
 quasar dev
 ```
+yarn quasar dev
 
 ### Lint the files
 ```bash

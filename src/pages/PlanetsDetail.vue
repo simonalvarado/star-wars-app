@@ -61,7 +61,7 @@
 
                 <q-card-section class="q-py-sm" v-for="(resident, index) in residents" :key="index">
                     <router-link :to="{ name: 'PeopleDetail', params: { id: transform(resident.url) } }">
-                        <b>Resident {{ index + 1 }}:</b> {{ resident.name }}
+                        <b class="black">Resident {{ index + 1 }}:</b> {{ resident.name }}
                     </router-link>
                 </q-card-section>
 
@@ -132,5 +132,6 @@ export default {
 <style lang="sass" scoped>
 a:-webkit-any-link
   text-decoration: none
-  color: #000000
+.black
+  color: black
 </style>

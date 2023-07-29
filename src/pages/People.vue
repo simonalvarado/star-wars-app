@@ -91,12 +91,16 @@ export default defineComponent({
   },
   methods: {
     async prevPage () {
+      this.loading = true
       const response = await axios.get(this.$store.state.previousPeople)
       this.$store.commit('setPeople', response.data)
+      this.loading = false
     },
     async nextPage () {
+      this.loading = true
       const response = await axios.get(this.$store.state.nextPeople)
       this.$store.commit('setPeople', response.data)
+      this.loading = false
     },
     searchPeople () {
       if (this.searchQuery === '') {
