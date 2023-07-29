@@ -30,7 +30,7 @@
                 <q-separator inset />
 
                 <q-card-section>
-                    <b>climate:</b> {{ planetsDetail.climate }}
+                    <b>Climate:</b> {{ planetsDetail.climate }}
                 </q-card-section>
 
                 <q-separator inset />
@@ -59,47 +59,78 @@
 
                 <q-separator inset />
 
-                <q-card-section class="q-py-sm" v-for="(resident, index) in planetsDetail.residentsData" :key="index">
-                    <b>Resident</b> {{ index + 1 }}: {{ resident.name }}
+                <q-card-section class="q-py-sm" v-for="(resident, index) in residents" :key="index">
+                    <router-link :to="{ name: 'PeopleDetail', params: { id: transform(resident.url) } }">
+                        <b>Resident {{ index + 1 }}:</b> {{ resident.name }}
+                    </router-link>
                 </q-card-section>
 
                 <q-separator inset />
 
-                <q-card-section class="q-py-sm" v-for="(film, index) in planetsDetail.filmsData" :key="index">
+                <q-card-section class="q-py-sm" v-for="(film, index) in films" :key="index">
                     <b>Film {{ index + 1 }}:</b> {{ film.title }}
                 </q-card-section>
 
-                <q-separator inset />
             </q-card>
         </div>
     </div>
 </template>
 <script>
-import { mapState } from 'vuex'
+import axios from 'axios'
+import transform from '../utils/transform.js'
 
 export default {
   name: 'PlanetsDetail',
   data () {
     return {
-      loading: true
+      loading: true,
+      residents: [],
+      films: [],
+      transform
     }
   },
 
-  mounted () {
+  async mounted () {
     const id = this.$route.params.id
-    this.fetchPlanetsDetail(id)
+    await this.fetchPlanetsDetail(id)
+    await this.fetchPlanetsDetailResidents()
+    await this.fetchPlanetsDetailFilms()
+    this.loading = false
   },
 
   computed: {
-    ...mapState(['planetsDetail'])
+    planetsDetail () {
+      return this.$store.state?.planetsDetail
+    },
+    residentsURL () {
+      return this.planetsDetail.residents.length ? this.planetsDetail.residents : null
+    },
+    filmsURL () {
+      return this.planetsDetail.films.length ? this.planetsDetail.films : null
+    }
   },
 
   methods: {
-    fetchPlanetsDetail (id) {
-      this.$store.dispatch('getPlanetsDetail', id).then(() => {
-        this.loading = false
-      })
+    async fetchPlanetsDetailResidents () {
+      for (let i = 0; i < this.planetsDetail.residents.length; i++) {
+        const response = await axios.get(this.residentsURL[i])
+        this.residents.push(response.data)
+      }
+    },
+    async fetchPlanetsDetailFilms () {
+      for (let i = 0; i < this.planetsDetail.films.length; i++) {
+        const response = await axios.get(this.filmsURL[i])
+        this.films.push(response.data)
+      }
+    },
+    async fetchPlanetsDetail (id) {
+      await this.$store.dispatch('getPlanetsDetail', id)
     }
   }
 }
 </script>
+<style lang="sass" scoped>
+a:-webkit-any-link
+  text-decoration: none
+  color: #000000
+</style>

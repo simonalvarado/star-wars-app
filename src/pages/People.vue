@@ -72,15 +72,14 @@ export default defineComponent({
     this.$store.dispatch('getPeople').then(() => {
       this.loading = false
       this.people = this.$store.state.people
-      console.log('mounted', this.people)
     })
   },
   computed: {
     disabledPrevButton () {
-      return this.$store.state.previous === null
+      return this.$store.state.previousPeople === null
     },
     disabledNextButton () {
-      return this.$store.state.next === null
+      return this.$store.state.nextPeople === null
     },
     filteredPeople () {
       return this.$store.state.people.filter((person) => {
@@ -92,11 +91,11 @@ export default defineComponent({
   },
   methods: {
     async prevPage () {
-      const response = await axios.get(this.$store.state.previous)
+      const response = await axios.get(this.$store.state.previousPeople)
       this.$store.commit('setPeople', response.data)
     },
     async nextPage () {
-      const response = await axios.get(this.$store.state.next)
+      const response = await axios.get(this.$store.state.nextPeople)
       this.$store.commit('setPeople', response.data)
     },
     searchPeople () {

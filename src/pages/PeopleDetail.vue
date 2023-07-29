@@ -1,9 +1,9 @@
 <template>
     <div>
-        <!-- <div v-if="loading" class="loading-container">
+        <div v-if="loading" class="loading-container">
             <q-spinner-dots size="60px" color="black" />
-        </div> -->
-        <!-- <div v-else> -->
+        </div>
+        <div v-else>
             <q-card flat bordered class="my-card text-center q-mb-md">
                 <q-card-section>
                     <div class="text-h4"> {{ peopleDetail.name }} </div>
@@ -53,35 +53,35 @@
 
                 <q-separator inset />
 
-                <!-- <q-card-section>
-                    <b>Homeworld:</b> {{ peopleDetail.homeworldData.name }}
+                <q-card-section>
+                    <b>Homeworld:</b> {{ homeworld.name ? homeworld.name : 'Unknown' }}
                 </q-card-section>
 
                 <q-separator inset />
 
-                <q-card-section class="q-py-sm" v-for="(film, index) in peopleDetail.filmsData" :key="index">
+                <q-card-section class="q-py-sm" v-for="(film, index) in films" :key="index">
                     <b>Film {{ index + 1 }}:</b> {{ film.title }}
                 </q-card-section>
 
                 <q-separator inset />
 
                 <q-card-section>
-                    <b>Species:</b> {{ peopleDetail.speciesData.name }}
+                    <b>Species:</b> {{ species.name ? species.name : 'Unknown' }}
                 </q-card-section>
 
                 <q-separator inset />
 
-                <q-card-section class="q-py-sm" v-for="(vehicle, index) in peopleDetail.vehiclesData" :key="index">
-                    <b>Vehicle</b> {{ index + 1 }}: {{ vehicle.name }}
+                <q-card-section class="q-py-sm" v-for="(vehicle, index) in vehicles" :key="index">
+                    <b>Vehicle {{ index + 1 }}:</b> {{ vehicle.name }}
                 </q-card-section>
 
                 <q-separator inset />
 
-                <q-card-section class="q-py-sm" v-for="(starship, index) in peopleDetail.starshipsData" :key="index">
+                <q-card-section class="q-py-sm" v-for="(starship, index) in starships" :key="index">
                     <b>Starship {{ index + 1 }}:</b> {{ starship.name }}
-                </q-card-section> -->
+                </q-card-section>
             </q-card>
-        <!-- </div> -->
+        </div>
     </div>
 </template>
 <script>
@@ -92,34 +92,78 @@ export default {
   data () {
     return {
       loading: true,
-      films: {}
+      homeworld: null,
+      films: [],
+      species: [],
+      vehicles: [],
+      starships: []
     }
   },
 
-  mounted () {
+  async mounted () {
     const id = this.$route.params.id
-    // this.fetchPeopleDetail(id)
-    this.$store.dispatch('getPeopleDetail', id)
-    console.log('people detail', this.peopleDetail)
-    console.log('people detail', this.fetchPeopleDetailFilms())
+    await this.fetchPeopleDetail(id)
+    await this.fetchPeopleDetailHomeworld()
+    await this.fetchPeopleDetailFilms()
+    await this.fetchPeopleDetailSpecies()
+    await this.fetchPeopleDetailVehicles()
+    await this.fetchPeopleDetailStarships()
+    this.loading = false
   },
 
   computed: {
     peopleDetail () {
       return this.$store.state?.peopleDetail
+    },
+    homeworldURL () {
+      return this.peopleDetail.homeworld.length ? this.peopleDetail.homeworld : null
+    },
+    filmsURL () {
+      return this.peopleDetail.films.length ? this.peopleDetail.films : null
+    },
+    speciesURL () {
+      return this.peopleDetail.species.length ? this.peopleDetail.species : null
+    },
+    vehiclesURL () {
+      return this.peopleDetail.vehicles.length ? this.peopleDetail.vehicles : null
+    },
+    starshipsURL () {
+      return this.peopleDetail.starships.length ? this.peopleDetail.starships : null
     }
   },
 
   methods: {
+    async fetchPeopleDetailHomeworld () {
+      const response = await axios.get(this.homeworldURL)
+      this.homeworld = response.data
+    },
     async fetchPeopleDetailFilms () {
       for (let i = 0; i < this.peopleDetail.films.length; i++) {
-        const response = await axios.get(this.peopleDetail.films[i])
+        const response = await axios.get(this.filmsURL[i])
         this.films.push(response.data)
       }
+    },
+    async fetchPeopleDetailSpecies () {
+      for (let i = 0; i < this.peopleDetail.species.length; i++) {
+        const response = await axios.get(this.speciesURL[i])
+        this.species = response.data
+      }
+    },
+    async fetchPeopleDetailVehicles () {
+      for (let i = 0; i < this.peopleDetail.vehicles.length; i++) {
+        const response = await axios.get(this.vehiclesURL[i])
+        this.vehicles.push(response.data)
+      }
+    },
+    async fetchPeopleDetailStarships () {
+      for (let i = 0; i < this.peopleDetail.starships.length; i++) {
+        const response = await axios.get(this.starshipsURL[i])
+        this.starships.push(response.data)
+      }
+    },
+    async fetchPeopleDetail (id) {
+      await this.$store.dispatch('getPeopleDetail', id)
     }
-    // fetchPeopleDetail (id) {
-    //   this.$store.dispatch('getPeopleDetail', id)
-    // }
   }
 }
 </script>

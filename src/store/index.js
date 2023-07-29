@@ -24,39 +24,40 @@ export default store(function (/* { ssrContext } */) {
       planets: [],
       starships: [],
       peopleDetail: {},
-      planetDetail: {},
-      starshipDetail: {},
-      planetsPageInfo: {},
-      previous: '',
-      next: ''
+      planetsDetail: {},
+      starshipsDetail: {},
+      previousPeople: '',
+      nextPeople: '',
+      previousPlanets: '',
+      nextPlanets: '',
+      previousStarships: '',
+      nextStarships: ''
     },
 
     mutations: {
       setPeople (state, payload) {
         state.people = payload.results
-        state.previous = payload.previous
-        state.next = payload.next
+        state.previousPeople = payload.previous
+        state.nextPeople = payload.next
       },
       setPlanets (state, payload) {
-        state.planets = payload
+        state.planets = payload.results
+        state.previousPlanets = payload.previous
+        state.nextPlanets = payload.next
       },
       setStarships (state, payload) {
-        state.starships = payload
+        state.starships = payload.results
+        state.previousStarships = payload.previous
+        state.nextStarships = payload.next
       },
       setPeopleDetail (state, payload) {
         state.peopleDetail = payload
       },
-      setPlanetDetail (state, payload) {
-        state.planetDetail = payload
+      setPlanetsDetail (state, payload) {
+        state.planetsDetail = payload
       },
-      setStarshipDetail (state, payload) {
-        state.starshipDetail = payload
-      },
-      setPlanetsPageInfo (state, payload) {
-        state.planetsPageInfo = payload
-      },
-      addPlanets (state, payload) {
-        state.planets = [...state.planets, ...payload]
+      setStarshipsDetail (state, payload) {
+        state.starshipsDetail = payload
       }
     },
 
@@ -69,43 +70,33 @@ export default store(function (/* { ssrContext } */) {
         const response = await axios.get('/people')
         commit('setPeople', response.data)
       },
-      async getPlanets ({ commit, dispatch }, page = 1) {
-        const response = await axios.get('/planets?page=' + page)
-        const planets = response.data.results
-
-        if (response.data.next) {
-          await dispatch('getPlanets', page + 1)
-        }
-
-        commit('addPlanets', planets)
-        const pageInfo = {
-          count: response.data.count,
-          next: response.data.next,
-          previous: response.data.previous
-        }
-
-        if (response.data.next) {
-          await dispatch('getPlanets', page + 1)
-        }
-
-        commit('setPlanets', planets)
-        commit('setPlanetsPageInfo', pageInfo)
+      async getOriginalPlanets ({ commit }) {
+        const response = await axios.get('/planets')
+        commit('setPlanets', response.data.results)
+      },
+      async getPlanets ({ commit }) {
+        const response = await axios.get('/planets')
+        commit('setPlanets', response.data)
+      },
+      async getOriginalStarships ({ commit }) {
+        const response = await axios.get('/starships')
+        commit('setStarships', response.data.results)
       },
       async getStarships ({ commit }) {
         const response = await axios.get('/starships')
-        commit('setStarships', response.data.results)
+        commit('setStarships', response.data)
       },
       async getPeopleDetail ({ commit }, id) {
         const response = await axios.get(`/people/${id}`)
         commit('setPeopleDetail', response.data)
       },
-      async getPlanetDetail ({ commit }, id) {
+      async getPlanetsDetail ({ commit }, id) {
         const response = await axios.get(`/planets/${id}`)
-        commit('setPlanetDetail', response.data)
+        commit('setPlanetsDetail', response.data)
       },
-      async getStarshipDetail ({ commit }, id) {
+      async getStarshipsDetail ({ commit }, id) {
         const response = await axios.get(`/starships/${id}`)
-        commit('setStarshipDetail', response.data)
+        commit('setStarshipsDetail', response.data)
       }
     },
 

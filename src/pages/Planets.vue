@@ -70,31 +70,32 @@ export default defineComponent({
   },
   mounted () {
     this.$store.dispatch('getPlanets').then(() => {
-      this.planets = this.$store.state.planets
       this.loading = false
-      console.log('mounted', this.planets)
+      this.planets = this.$store.state.planets
     })
   },
   computed: {
     disabledPrevButton () {
-      return this.$store.state.planetsPrevious === null
+      return this.$store.state.previousPlanets === null
     },
     disabledNextButton () {
-      return this.$store.state.planetsNext === null
+      return this.$store.state.nextPlanets === null
     },
     filteredPlanets () {
       return this.$store.state.planets.filter((planet) => {
-        return planet.name.toLowerCase().includes(this.searchQuery.toLowerCase())
+        return planet.name
+          .toLowerCase()
+          .includes(this.searchQuery.toLowerCase())
       })
     }
   },
   methods: {
     async prevPage () {
-      const response = await axios.get(this.$store.state.previous)
+      const response = await axios.get(this.$store.state.previousPlanets)
       this.$store.commit('setPlanets', response.data)
     },
     async nextPage () {
-      const response = await axios.get(this.$store.state.next)
+      const response = await axios.get(this.$store.state.nextPlanets)
       this.$store.commit('setPlanets', response.data)
     },
     searchPlanets () {

@@ -6,7 +6,9 @@
         <q-btn @click="$router.go(-1)" v-if="showBackButton" flat dense icon="fas fa-arrow-left" class="absolute" size="sm" />
 
         <q-toolbar-title class="text-center">
+          <q-icon name="fas fa-jedi" class="q-px-sm" />
           Star Wars App
+          <q-icon name="fas fa-jedi" class="q-px-sm" />
         </q-toolbar-title>
 
       </q-toolbar>
@@ -31,7 +33,6 @@ export default defineComponent({
   setup () {
     const route = useRoute()
     const showBackButton = ref(false)
-    console.log('route path', route.path)
     watch(
       () => route.path,
       (newPath) => {
