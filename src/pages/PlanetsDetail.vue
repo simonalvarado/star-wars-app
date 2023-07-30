@@ -59,7 +59,10 @@
 
                 <q-separator inset />
 
-                <q-card-section class="q-py-sm" v-for="(resident, index) in residents" :key="index">
+                <q-card-section v-if="isLoadingResidents">
+                    Loading...
+                </q-card-section>
+                <q-card-section v-else class="q-py-sm" v-for="(resident, index) in residents" :key="index">
                     <router-link :to="{ name: 'PeopleDetail', params: { id: transform(resident.url) } }">
                         <b class="black">Resident {{ index + 1 }}:</b> {{ resident.name }}
                     </router-link>
@@ -67,7 +70,10 @@
 
                 <q-separator inset />
 
-                <q-card-section class="q-py-sm" v-for="(film, index) in films" :key="index">
+                <q-card-section v-if="isLoadingFilms">
+                    Loading...
+                </q-card-section>
+                <q-card-section v-else class="q-py-sm" v-for="(film, index) in films" :key="index">
                     <b>Film {{ index + 1 }}:</b> {{ film.title }}
                 </q-card-section>
 
@@ -83,7 +89,9 @@ export default {
   name: 'PlanetsDetail',
   data () {
     return {
-      loading: true,
+      loading: false,
+      isLoadingResidents: false,
+      isLoadingFilms: false,
       residents: [],
       films: [],
       transform
@@ -111,20 +119,26 @@ export default {
   },
 
   methods: {
+    async fetchPlanetsDetail (id) {
+      this.loading = true
+      await this.$store.dispatch('getPlanetsDetail', id)
+      this.loading = false
+    },
     async fetchPlanetsDetailResidents () {
       for (let i = 0; i < this.planetsDetail.residents.length; i++) {
+        this.isLoadingResidents = true
         const response = await axios.get(this.residentsURL[i])
+        this.isLoadingResidents = false
         this.residents.push(response.data)
       }
     },
     async fetchPlanetsDetailFilms () {
       for (let i = 0; i < this.planetsDetail.films.length; i++) {
+        this.isLoadingFilms = true
         const response = await axios.get(this.filmsURL[i])
+        this.isLoadingFilms = false
         this.films.push(response.data)
       }
-    },
-    async fetchPlanetsDetail (id) {
-      await this.$store.dispatch('getPlanetsDetail', id)
     }
   }
 }

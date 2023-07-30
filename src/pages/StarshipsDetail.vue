@@ -77,13 +77,19 @@
 
                 <q-separator inset />
 
+                <q-card-section v-if="isLoadingPilots">
+                    Loading...
+                </q-card-section>
                 <q-card-section class="q-py-sm" v-for="(pilot, index) in pilots" :key="index">
                     <b>Resident {{ index + 1 }}:</b> {{ pilot.name }}
                 </q-card-section>
 
                 <q-separator inset />
 
-                <q-card-section class="q-py-sm" v-for="(film, index) in films" :key="index">
+                <q-card-section v-if="isLoadingFilms">
+                    Loading...
+                </q-card-section>
+                <q-card-section v-else class="q-py-sm" v-for="(film, index) in films" :key="index">
                     <b>Film {{ index + 1 }}:</b> {{ film.title }}
                 </q-card-section>
 
@@ -98,7 +104,9 @@ export default {
   name: 'StarshipsDetail',
   data () {
     return {
-      loading: true,
+      loading: false,
+      isLoadingPilots: false,
+      isLoadingFilms: false,
       pilots: [],
       films: []
     }
@@ -125,20 +133,26 @@ export default {
   },
 
   methods: {
+    async fetchStarshipsDetail (id) {
+      this.loading = true
+      await this.$store.dispatch('getStarshipsDetail', id)
+      this.loading = false
+    },
     async fetchStarshipsDetailResidents () {
       for (let i = 0; i < this.starshipsDetail.pilots.length; i++) {
+        this.isLoadingPilots = true
         const response = await axios.get(this.pilotsURL[i])
+        this.isLoadingPilots = false
         this.pilots.push(response.data)
       }
     },
     async fetchStarshipsDetailFilms () {
       for (let i = 0; i < this.starshipsDetail.films.length; i++) {
+        this.isLoadingFilms = true
         const response = await axios.get(this.filmsURL[i])
+        this.isLoadingFilms = false
         this.films.push(response.data)
       }
-    },
-    async fetchStarshipsDetail (id) {
-      await this.$store.dispatch('getStarshipsDetail', id)
     }
   }
 }
